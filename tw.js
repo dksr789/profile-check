@@ -22,9 +22,11 @@ app.post('/api/request-info', async (req, res) => {
             headers: {
                 'Accept': 'application/json, text/plain, */*',
                 'Content-Type': 'application/json',
-                'Origin': 'https://twicsy.com',
-                'Referer': 'https://twicsy.com/',
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+                'Referer': 'https://twicsy.com/',
+                'Origin': 'https://twicsy.com',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept-Language': 'en-US,en;q=0.9',
             }
         });
 
@@ -32,7 +34,7 @@ app.post('/api/request-info', async (req, res) => {
         res.json(response.data);
 
     } catch (error) {
-        console.error('Error making request:', error);
+        console.error('Error making request:', error.response ? error.response.data : error.message);
         res.status(500).send('Error making request');
     }
 });
@@ -43,11 +45,16 @@ app.get('/proxy-image', async (req, res) => {
     try {
         const response = await axios.get(imageUrl, {
             responseType: 'arraybuffer', // To handle binary data
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+                'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
+                'Referer': 'https://instagram.com/',
+            }
         });
         res.set('Content-Type', response.headers['content-type']); // Set the correct content type
         res.send(response.data); // Send the image data
     } catch (error) {
-        console.error('Error fetching image:', error);
+        console.error('Error fetching image:', error.response ? error.response.data : error.message);
         res.status(500).send('Error fetching image');
     }
 });
