@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #user-info {
+            margin-top: 20px;
+        }
+        img {
+            border-radius: 50%;
+        }
+        input[type="text"], button {
+            padding: 10px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Info Fetcher</h1>
+    <input type="text" id="username" placeholder="Enter Username" />
+    <button id="fetch-button">Fetch User Info</button>
+
+    <div id="user-info"></div>
+
+    <script>
+        document.getElementById('fetch-button').addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/request-info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const userData = await response.json();
+                displayUserInfo(userData);
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+                alert('Failed to fetch user info. Please check the console for more details.');
+            }
+        });
+
+        function displayUserInfo(user) {
+            const userInfoDiv = document.getElementById('user-info');
+            const proxyUrl = `http://localhost:3000/proxy-image?url=${encodeURIComponent(user.picture_hd)}`;
+            
+            userInfoDiv.innerHTML = `
+                <img src="${proxyUrl}" alt="${user.username}" width="150">
+                <h2>${user.username}</h2>
+                <p><strong>Followers:</strong> ${user.followers}</p>
+                <p><strong>Following:</strong> ${user.following}</p>
+                <p><strong>Posts:</strong> ${user.post_count}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
